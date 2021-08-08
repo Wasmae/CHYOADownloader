@@ -15,9 +15,14 @@ class Page:
             self.root = self
             self.traversed = []
             self.dir = dir + "/" + self.content.find("h1").text
+            self.pageCurrent = 0
+
         self.parent = parent
         self.url = url
         self.name = name
+
+        self.root.pageCurrent += 1
+        print(str(self.root.pageCurrent) + " Links Scraped")
 
         self.getChildren()
 
@@ -27,7 +32,6 @@ class Page:
         self.children = []
         temp = self.content.find("div",class_="question-content")
         links = BeautifulSoup(str(temp), 'html.parser')
-
         #Create new Page for each link in div
         for i in links.find_all("a", class_=""):
             href = i['href']
