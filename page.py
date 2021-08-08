@@ -3,13 +3,15 @@ from bs4 import BeautifulSoup
 import os
 import unicodedata
 import re
+import shutil
 
 class Page:
-    def __init__(self, url, name, dir, filename="index", root=None, parent=None):
+    def __init__(self, url, name, dir, downloadImages, filename="index", root=None, parent=None):
         self.root = root
         self.dir = dir
         self.content = BeautifulSoup(requests.get(url).text,'html.parser')
         self.filename = self.slugify(filename)+".html"
+        self.downloadImages = downloadImages
         #Name root directory according to story title
         if root == None:
             self.root = self
@@ -26,6 +28,7 @@ class Page:
 
         self.getChildren()
 
+        os.makedirs(self.dir+"/images", exist_ok=True)
         os.makedirs(self.dir+"/chapters", exist_ok=True)
     
     def getChildren(self):
@@ -36,13 +39,30 @@ class Page:
         for i in links.find_all("a", class_=""):
             href = i['href']
 
-            child = Page(href,i.text, self.dir, filename=self.name+"-"+i.text,root=self.root, parent=self)
+            child = Page(href,i.text, self.dir, self.downloadImages,filename=self.name+"-"+i.text,root=self.root, parent=self)
             self.children.append(child)
     
     def createHTML(self):
         #Base HTML
         html = BeautifulSoup("<!DOCTYPE html><html><head></head><body></body></html>", 'html.parser')
         
+        if(self.downloadImages):
+            if(self.root == self):
+                coverImage = self.content.find("div",class_="cover").find("img")
+                if(coverImage):
+                    savePath = self.dir + "/images/" + self.slugify(coverImage['alt'])
+                    self.saveImage(coverImage['src'],savePath)
+                    coverImage['src'] = savePath
+            
+            contentImages = self.content.find('div',class_="chapter-content").find_all('img')
+            for i in range(len(contentImages)):
+                image = contentImages[i]
+                name = self.slugify(str(i)+self.name)
+                savePath = self.dir + "/images/" + name
+                self.saveImage(image['src'],savePath)
+                image['src'] = savePath
+    
+
         #Add CSS
         head = html.find("head")
         stylesheet = html.new_tag("style")
@@ -134,6 +154,20 @@ class Page:
 
         #Create HTML for child Pages
         [i.createHTML() for i in self.children]
+
+    def saveImage(self, url, file):
+        r = requests.get(url, stream = True)
+
+        # Check if the image was retrieved successfully
+        if r.status_code == 200:
+            # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
+            r.raw.decode_content = True
+            
+            # Open a local file with wb ( write binary ) permission.
+            with open(file,'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+        else:
+            raise ValueError("Unable to download image")
 
     #Function to convert page names into valid file paths
     def slugify(self, value, allow_unicode=False):
