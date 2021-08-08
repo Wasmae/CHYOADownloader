@@ -9,7 +9,7 @@ parser.add_argument('--directory','-d', help="Directory to store downloaded file
 
 args = vars(parser.parse_args())
 
-print(args)
+
 
 
 page = Page(args['link'], "", args['directory'])
