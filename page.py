@@ -5,11 +5,11 @@ import unicodedata
 import re
 
 class Page:
-    def __init__(self, url, name, dir, root=None, parent=None):
+    def __init__(self, url, name, dir, filename="index", root=None, parent=None):
         self.root = root
         self.dir = dir
         self.content = BeautifulSoup(requests.get(url).text,'html.parser')
-
+        self.filename = self.slugify(filename)+".html"
         #Name root directory according to story title
         if root == None:
             self.root = self
@@ -31,11 +31,9 @@ class Page:
         #Create new Page for each link in div
         for i in links.find_all("a", class_=""):
             href = i['href']
-            #Check if link has been traversed and add to root Page log if not
-            if href not in self.root.traversed:
-                self.root.traversed.append(href)
-                child = Page(href, i.text, self.dir, root=self.root, parent=self)
-                self.children.append(child)
+
+            child = Page(href,i.text, self.dir, filename=self.name+"-"+i.text,root=self.root, parent=self)
+            self.children.append(child)
     
     def createHTML(self):
         #Base HTML
@@ -85,7 +83,7 @@ class Page:
         for i in self.children:
             link = html.new_tag("a")
             link.string = i.name
-            link['href'] = i.dir+"/chapters/"+self.slugify(i.name)+".html" 
+            link['href'] = i.dir+"/chapters/"+i.filename 
             link['class'] = "chapterLinks"
             linkContainer.append(link)
 
@@ -97,7 +95,7 @@ class Page:
         #Link to return to previous page
         try:
             back.string = "Previous Chapter"
-            back['href'] = self.dir+"/index.html" if self.parent==self.root else self.dir+"/chapters/"+self.slugify(self.parent.name)+".html"
+            back['href'] = self.dir+"/index.html" if self.parent==self.root else self.dir+"/chapters/"+self.parent.filename
             back['class'] = "styledLink prev"
             persistent.append(back)
         except AttributeError:
@@ -127,7 +125,7 @@ class Page:
             published = open(self.dir+"/index.html", 'w', encoding='utf-8')
         else:
             #[chapter name].html file in 'chapters' directory
-            published=open(self.dir+'/chapters/'+self.slugify(self.name)+'.html', 'w', encoding="utf-8")
+            published=open(self.dir+'/chapters/'+self.filename, 'w', encoding="utf-8")
         published.write(str(html.prettify()))
 
         #Create HTML for child Pages

@@ -9,8 +9,9 @@ parser.add_argument('--directory','-d', help="Directory to store downloaded file
 
 args = vars(parser.parse_args())
 
-
-
-
+print("Collecting Links")
 page = Page(args['link'], "", args['directory'])
+print("Links Collected")
+print("Building HTML Files")
 page.createHTML()
+print("Download Complete")
