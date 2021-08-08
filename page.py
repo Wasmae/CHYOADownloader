@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 import os
 import unicodedata
 import re
