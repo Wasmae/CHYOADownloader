@@ -5,7 +5,7 @@ Download CHYOADownloader by cloning the git repository `git clone https://github
 
 
 ## Usage
-Run `pip install requirements.txt' in your terminal.`
+Run `pip install requirements.txt` in your terminal.`
 
 ```
 usage: main.py [-h] [--link LINK] [--directory DIRECTORY]
