@@ -1,5 +1,7 @@
 body{
-    background-color:rgb(247, 247, 247);
+    background-color:rgb(252, 252, 252);
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .linkContainer a, .linkContainer p{
@@ -28,7 +30,7 @@ a{
 .chapterLinks{
     border-top: 1px;
     text-decoration:none;
-    background-color:rgb(211, 211, 211);
+    background-color:rgb(235, 235, 235);
 }
 
 img{
@@ -40,7 +42,7 @@ img{
 }
 
 p, h1, h2{
-    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 header{
@@ -48,7 +50,7 @@ header{
 }
 
 .styledLink{
-    background-color:rgb(211, 211, 211);
+    background-color:rgb(235, 235, 235);
     border-radius:0.2rem;
     padding:0.2rem;
     text-decoration:none;
